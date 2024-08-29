@@ -46,9 +46,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(mainBinding.root)
 
         // Add task start
-
         val addCloseImg = addTaskDialog.findViewById<ImageView>(R.id.closeImg)
-        addCloseImg.setOnClickListener { addTaskDialog.dismiss() }
+        addCloseImg.setOnClickListener { addTaskDialog.dismiss()
+            Log.e("PISO", "Cerro ") }
 
         val addETTitle = addTaskDialog.findViewById<TextInputEditText>(R.id.edTaskTitle)
         val addETTitleL = addTaskDialog.findViewById<TextInputLayout>(R.id.edTaskTitleL)
@@ -77,18 +77,19 @@ class MainActivity : AppCompatActivity() {
             addTaskDialog.show()
         }
 
+
         val saveTaskBtn = addTaskDialog.findViewById<Button>(R.id.saveTaskBtn)
         saveTaskBtn.setOnClickListener {
-            Log.e("PISO", "Piso ")
-            Toast.makeText(this, "Validate", Toast.LENGTH_SHORT).show();
-/*            if (validateEditText(addETTitle, addETTitleL)
+            if (validateEditText(addETTitle, addETTitleL)
                 && validateEditText(addETDesc, addETDescL)
             ) {
                 addTaskDialog.dismiss()
                 Toast.makeText(this, "Validate", Toast.LENGTH_SHORT).show();
                 loadingDialog.show()
-            }*/
+            }
         }
+
+
 
         // Add task end
 
@@ -103,7 +104,6 @@ class MainActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable) {
                 validateEditText(updateETTitle, updateETTitleL)
             }
-
         })
 
         val updateETDesc = updateTaskDialog.findViewById<TextInputEditText>(R.id.edTaskDesc)
@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val updateTaskBtn = updateTaskDialog.findViewById<Button>(R.id.updateTaskBtn)
-        saveTaskBtn.setOnClickListener {
+        updateTaskBtn.setOnClickListener {
             if (validateEditText(updateETTitle, updateETTitleL)
                 && validateEditText(updateETDesc, updateETDescL)
             ) {
