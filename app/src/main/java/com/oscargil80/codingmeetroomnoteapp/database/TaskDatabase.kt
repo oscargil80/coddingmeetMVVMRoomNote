@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.oscargil80.codingmeetroomnoteapp.converters.TypeConverter
+import com.oscargil80.codingmeetroomnoteapp.dao.TaskDao
 import com.oscargil80.codingmeetroomnoteapp.models.Task
 
 
@@ -17,6 +18,8 @@ import com.oscargil80.codingmeetroomnoteapp.models.Task
 
 @TypeConverters(TypeConverter::class)
 abstract class TaskDatabase : RoomDatabase() {
+
+    abstract  val taskDao : TaskDao
 
         companion object {
         @Volatile

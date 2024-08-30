@@ -1,9 +1,25 @@
 package com.oscargil80.codingmeetroomnoteapp.util
 
 import android.app.Dialog
+import android.content.Context
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.Toast
 import com.google.android.material.textfield.TextInputLayout
+
+
+enum class Status {
+    SUCCESS,
+    ERROR,
+    LOADING
+}
+
+
+ fun Context.longToastShow(msg:String){
+     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+ }
+
+
 
 fun Dialog.setupDialog(layoutResId:Int){
     setContentView(layoutResId)
@@ -26,4 +42,9 @@ fun validateEditText(editText: EditText, textTextInputLayout: TextInputLayout): 
             true
         }
     }
+}
+
+fun clearEditText(editText:EditText, textTextInputLayout: TextInputLayout){
+    editText.text = null
+    textTextInputLayout.error = null
 }

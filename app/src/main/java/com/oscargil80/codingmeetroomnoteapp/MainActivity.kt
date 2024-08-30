@@ -10,11 +10,19 @@ import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.oscargil80.codingmeetroomnoteapp.adapter.TaskRecyclerViewAdapter
 import com.oscargil80.codingmeetroomnoteapp.databinding.ActivityMainBinding
-import com.oscargil80.codingmeetroomnoteapp.util.setupDialog
-import com.oscargil80.codingmeetroomnoteapp.util.validateEditText
+import com.oscargil80.codingmeetroomnoteapp.models.Task
+import com.oscargil80.codingmeetroomnoteapp.util.*
+import com.oscargil80.codingmeetroomnoteapp.viewmodels.TaskViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+
+import kotlinx.coroutines.launch
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,15 +48,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val taskViewModel: TaskViewModel by lazy {
+        ViewModelProvider(this).get(TaskViewModel::class.java)
+    }
+
+    private val taskRecyclerViewAdapter : TaskRecyclerViewAdapter by lazy {
+        TaskRecyclerViewAdapter()
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
 
+        mainBinding.taskRV.adapter = taskRecyclerViewAdapter
+
         // Add task start
+
         val addCloseImg = addTaskDialog.findViewById<ImageView>(R.id.closeImg)
-        addCloseImg.setOnClickListener { addTaskDialog.dismiss()
-            Log.e("PISO", "Cerro ") }
+        addCloseImg.setOnClickListener {
+            addTaskDialog.dismiss()
+        }
 
         val addETTitle = addTaskDialog.findViewById<TextInputEditText>(R.id.edTaskTitle)
         val addETTitleL = addTaskDialog.findViewById<TextInputLayout>(R.id.edTaskTitleL)
@@ -59,7 +79,6 @@ class MainActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable) {
                 validateEditText(addETTitle, addETTitleL)
             }
-
         })
 
         val addETDesc = addTaskDialog.findViewById<TextInputEditText>(R.id.edTaskDesc)
@@ -74,9 +93,11 @@ class MainActivity : AppCompatActivity() {
         })
 
         mainBinding.addTaskFABtn.setOnClickListener {
+            clearEditText(addETTitle, addETTitleL)
+            clearEditText(addETDesc, addETDescL)
+
             addTaskDialog.show()
         }
-
 
         val saveTaskBtn = addTaskDialog.findViewById<Button>(R.id.saveTaskBtn)
         saveTaskBtn.setOnClickListener {
@@ -84,13 +105,34 @@ class MainActivity : AppCompatActivity() {
                 && validateEditText(addETDesc, addETDescL)
             ) {
                 addTaskDialog.dismiss()
-                Toast.makeText(this, "Validate", Toast.LENGTH_SHORT).show();
-                loadingDialog.show()
+                val newTask = Task(
+                    UUID.randomUUID().toString(),
+                    addETTitle.text.toString().trim(),
+                    addETDesc.text.toString().trim(),
+                    Date()
+                )
+                taskViewModel.insertTask(newTask).observe(this) {
+                    when (it.status) {
+                        Status.LOADING -> {
+                            loadingDialog.show()
+                        }
+                        Status.SUCCESS -> {
+                            loadingDialog.dismiss()
+                            if (it.date?.toInt() != -1) {
+                                longToastShow("Task Added Successsfuly")
+                            }
+                        }
+                        Status.ERROR -> {
+                            loadingDialog.dismiss()
+                            it.message?.let { it1 ->
+                                longToastShow(it1)
+                            }
+                        }
+                    }
+                }
+
             }
         }
-
-
-
         // Add task end
 
 
@@ -133,7 +175,34 @@ class MainActivity : AppCompatActivity() {
             }
         }
         //update task End
+        callGetTaskList()
+    }
 
+    private fun callGetTaskList() {
 
+        loadingDialog.show()
+        CoroutineScope(Dispatchers.Main).launch {
+            taskViewModel.getTaskList().collect {
+                when (it.status) {
+                    Status.LOADING -> {
+                        loadingDialog.show()
+                    }
+                    Status.SUCCESS -> {
+                        it.date?.collect { taskList ->
+                            loadingDialog.dismiss()
+                            taskRecyclerViewAdapter.addAllTask(taskList)
+                            Log.e("Paso", "PASO POR AQUI2" )
+                        }
+
+                    }
+                    Status.ERROR -> {
+                        loadingDialog.dismiss()
+                        it.message?.let { it1 ->
+                            longToastShow(it1)
+                        }
+                    }
+                }
+            }
+        }
     }
 }

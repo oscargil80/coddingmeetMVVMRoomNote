@@ -97,6 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/edSearchL"
                 android:layout_marginTop="8dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:layout_marginHorizontal="10dp"
                 android:layout_centerHorizontal="true"
                 android:clipToPadding="false"
