@@ -52,16 +52,11 @@ class MainActivity : AppCompatActivity() {
         ViewModelProvider(this).get(TaskViewModel::class.java)
     }
 
-    private val taskRecyclerViewAdapter : TaskRecyclerViewAdapter by lazy {
-        TaskRecyclerViewAdapter()
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
 
-        mainBinding.taskRV.adapter = taskRecyclerViewAdapter
 
         // Add task start
 
@@ -165,20 +160,85 @@ class MainActivity : AppCompatActivity() {
         }
 
         val updateTaskBtn = updateTaskDialog.findViewById<Button>(R.id.updateTaskBtn)
-        updateTaskBtn.setOnClickListener {
-            if (validateEditText(updateETTitle, updateETTitleL)
-                && validateEditText(updateETDesc, updateETDescL)
-            ) {
-                updateTaskDialog.dismiss()
-                Toast.makeText(this, "Validate", Toast.LENGTH_SHORT).show();
-                loadingDialog.show()
+
+        //update task End
+
+        val taskRecyclerViewAdapter = TaskRecyclerViewAdapter { type, position, task ->
+            if (type == "delete") {
+                taskViewModel
+                    //.deleteTask(task)
+                    .deleteTaskUsingId(task.id)
+                    .observe(this) {
+                        when (it.status) {
+                            Status.LOADING -> {
+                                loadingDialog.show()
+                            }
+                            Status.SUCCESS -> {
+                                loadingDialog.dismiss()
+                                if (it.date != -1) {
+                                    longToastShow("Task Deleted Successsfuly")
+                                }
+
+                            }
+                            Status.ERROR -> {
+                                loadingDialog.dismiss()
+                                it.message?.let { it1 -> longToastShow(it1) }
+                            }
+                        }
+                    }
+            } else if (type == "update") {
+                updateETTitle.setText(task.tittle)
+                updateETDesc.setText(task.description)
+
+                updateTaskBtn.setOnClickListener {
+                    if (validateEditText(updateETTitle, updateETTitleL)
+                        && validateEditText(updateETDesc, updateETDescL)
+                    ) {
+                        val updateTask = Task(
+                            task.id,
+                            updateETTitle.text.toString().trim(),
+                            updateETDesc.text.toString().trim(),
+                            Date()
+
+                        )
+                        updateTaskDialog.dismiss()
+                        loadingDialog.show()
+
+                        taskViewModel
+                            //.updateTask(updateTask)
+                            .updateTaskParticularField(
+                                task.id,
+                                updateETTitle.text.toString().trim(),
+                                updateETDesc.text.toString().trim(),
+                            )
+                            .observe(this) {
+                                when (it.status) {
+                                    Status.LOADING -> {
+                                        loadingDialog.show()
+                                    }
+                                    Status.SUCCESS -> {
+                                        loadingDialog.dismiss()
+                                        if (it.date != -1) {
+                                            longToastShow("Task Updated Successfully")
+                                        }
+
+                                    }
+                                    Status.ERROR -> {
+                                        loadingDialog.dismiss()
+                                        it.message?.let { it1 -> longToastShow(it1) }
+                                    }
+                                }
+                            }
+                    }
+                }
+                updateTaskDialog.show()
             }
         }
-        //update task End
-        callGetTaskList()
+        mainBinding.taskRV.adapter = taskRecyclerViewAdapter
+        callGetTaskList(taskRecyclerViewAdapter)
     }
 
-    private fun callGetTaskList() {
+    private fun callGetTaskList(taskRecyclerViewAdapter: TaskRecyclerViewAdapter) {
 
         loadingDialog.show()
         CoroutineScope(Dispatchers.Main).launch {
@@ -191,7 +251,7 @@ class MainActivity : AppCompatActivity() {
                         it.date?.collect { taskList ->
                             loadingDialog.dismiss()
                             taskRecyclerViewAdapter.addAllTask(taskList)
-                            Log.e("Paso", "PASO POR AQUI2" )
+                            Log.e("Paso", "PASO POR AQUI2")
                         }
 
                     }

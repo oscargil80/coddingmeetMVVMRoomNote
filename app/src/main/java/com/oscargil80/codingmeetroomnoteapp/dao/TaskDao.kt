@@ -1,11 +1,9 @@
 package com.oscargil80.codingmeetroomnoteapp.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.oscargil80.codingmeetroomnoteapp.models.Task
 import kotlinx.coroutines.flow.Flow
+import java.util.*
 
 @Dao
 interface TaskDao {
@@ -16,6 +14,19 @@ interface TaskDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: Task):Long
+
+
+    @Delete
+    suspend fun deleteTask(task: Task):Int
+
+    @Query("Delete from task where taskId == :taskID")
+    suspend fun deleteTaskUsingId(taskID : String): Int
+
+    @Update
+    suspend fun updateTask(task: Task):Int
+
+    @Query("update task set taskTittle= :title, description= :description  where taskId == :taskID ")
+    suspend fun updateTaskParticularField(taskID: String, title: String, description:String):Int
 
 
 }
