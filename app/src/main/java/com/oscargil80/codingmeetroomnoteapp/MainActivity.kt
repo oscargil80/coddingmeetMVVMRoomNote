@@ -10,9 +10,13 @@ import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.view.drawToBitmap
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.oscargil80.codingmeetroomnoteapp.adapter.TaskRVBindingAdapter
+import com.oscargil80.codingmeetroomnoteapp.adapter.TaskRVListAdapter
 import com.oscargil80.codingmeetroomnoteapp.adapter.TaskRecyclerViewAdapter
 import com.oscargil80.codingmeetroomnoteapp.databinding.ActivityMainBinding
 import com.oscargil80.codingmeetroomnoteapp.models.Task
@@ -163,7 +167,7 @@ class MainActivity : AppCompatActivity() {
 
         //update task End
 
-        val taskRecyclerViewAdapter = TaskRecyclerViewAdapter { type, position, task ->
+        val taskRVListAdapter = TaskRVListAdapter { type, position, task ->
             if (type == "delete") {
                 taskViewModel
                     //.deleteTask(task)
@@ -234,11 +238,19 @@ class MainActivity : AppCompatActivity() {
                 updateTaskDialog.show()
             }
         }
-        mainBinding.taskRV.adapter = taskRecyclerViewAdapter
-        callGetTaskList(taskRecyclerViewAdapter)
+        mainBinding.taskRV.adapter = taskRVListAdapter
+        taskRVListAdapter.registerAdapterDataObserver(object :RecyclerView.AdapterDataObserver()
+        {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                mainBinding.taskRV.smoothScrollToPosition(positionStart)
+            }
+        }
+        )
+        callGetTaskList(taskRVListAdapter)
     }
 
-    private fun callGetTaskList(taskRecyclerViewAdapter: TaskRecyclerViewAdapter) {
+    private fun callGetTaskList(taskRecyclerViewAdapter: TaskRVListAdapter) {
 
         loadingDialog.show()
         CoroutineScope(Dispatchers.Main).launch {
@@ -250,7 +262,7 @@ class MainActivity : AppCompatActivity() {
                     Status.SUCCESS -> {
                         it.date?.collect { taskList ->
                             loadingDialog.dismiss()
-                            taskRecyclerViewAdapter.addAllTask(taskList)
+                            taskRecyclerViewAdapter.submitList(taskList)
                             Log.e("Paso", "PASO POR AQUI2")
                         }
 
