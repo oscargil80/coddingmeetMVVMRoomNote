@@ -2,6 +2,8 @@ package com.oscargil80.codingmeetroomnoteapp.util
 
 import android.app.Dialog
 import android.content.Context
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -14,14 +16,30 @@ enum class Status {
     LOADING
 }
 
+enum class StatusResult {
+    Added,
+    Updated,
+    Deleted
+}
 
- fun Context.longToastShow(msg:String){
-     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
- }
+fun Context.hideKeyBoard(view: View) {
+    try {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 
 
+}
 
-fun Dialog.setupDialog(layoutResId:Int){
+
+fun Context.longToastShow(msg: String) {
+    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+}
+
+
+fun Dialog.setupDialog(layoutResId: Int) {
     setContentView(layoutResId)
     window!!.setLayout(
         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -44,7 +62,7 @@ fun validateEditText(editText: EditText, textTextInputLayout: TextInputLayout): 
     }
 }
 
-fun clearEditText(editText:EditText, textTextInputLayout: TextInputLayout){
+fun clearEditText(editText: EditText, textTextInputLayout: TextInputLayout) {
     editText.text = null
     textTextInputLayout.error = null
 }
