@@ -28,5 +28,8 @@ interface TaskDao {
     @Query("update task set taskTittle= :title, description= :description  where taskId == :taskID ")
     suspend fun updateTaskParticularField(taskID: String, title: String, description:String):Int
 
+    @Query("SELECT * FROM  Task where taskTittle like :query Order by  date DESC")
+    fun searchTaskList(query:String) : Flow<List<Task>>
+
 
 }

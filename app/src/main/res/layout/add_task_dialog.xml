@@ -89,8 +89,6 @@
                 style="@style/Widget.App.Button.Fill"
                 android:text="Save Task"
                 android:textSize="20sp" />
-
-
         </LinearLayout>
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

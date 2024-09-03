@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.oscargil80.codingmeetroomnoteapp.R
-import com.oscargil80.codingmeetroomnoteapp.databinding.ViewTaskListLayoutBinding
+import com.oscargil80.codingmeetroomnoteapp.databinding.ViewTaskLayoutBinding
 import com.oscargil80.codingmeetroomnoteapp.models.Task
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,7 +22,7 @@ class TaskRVListAdapter(
    // private val taskList = arrayListOf<Task>()
 
 
-    class ViewHolder( val viewTaskLayoutBinding: ViewTaskListLayoutBinding)
+    class ViewHolder( val viewTaskLayoutBinding: ViewTaskLayoutBinding)
         : RecyclerView.ViewHolder(viewTaskLayoutBinding.root)
 
 
@@ -35,7 +35,7 @@ class TaskRVListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ViewTaskListLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ViewTaskLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
     }
 

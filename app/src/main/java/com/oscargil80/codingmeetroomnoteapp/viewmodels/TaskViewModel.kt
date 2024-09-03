@@ -40,4 +40,8 @@ class TaskViewModel(application: Application): AndroidViewModel(application) {
          taskRepository.updateTask(task)
     }
 
+    fun searchTaskList(query:String){
+        taskRepository.searchTaskList(query)
+    }
+
 }
