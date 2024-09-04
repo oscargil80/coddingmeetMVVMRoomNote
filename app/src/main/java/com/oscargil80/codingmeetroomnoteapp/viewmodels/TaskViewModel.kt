@@ -13,10 +13,16 @@ class TaskViewModel(application: Application): AndroidViewModel(application) {
     private val taskRepository = TaskRepository(application)
     val taskStateFlow get() = taskRepository.taskStateFlow
     val statusLiveData get() = taskRepository.statusLiveData
+    val sortByLiveData get() = taskRepository.sortByLiveData
+
+    fun setSortBy(sort:Pair<String, Boolean>){
+        taskRepository.setSortBy(sort)
+    }
 
 
-    fun getTaskList() {
-        taskRepository.getTaskList()
+
+    fun  getTaskList(isAsc : Boolean, sortByName:String) {
+        taskRepository.getTaskList(isAsc, sortByName)
     }
 
 

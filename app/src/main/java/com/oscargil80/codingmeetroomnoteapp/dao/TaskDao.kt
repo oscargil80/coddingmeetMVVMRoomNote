@@ -8,8 +8,16 @@ import java.util.*
 @Dao
 interface TaskDao {
 
-    @Query("SELECT * FROM  Task Order by  date DESC")
-    fun getTaskList() : Flow<List<Task>>
+    @Query(""""SELECT * FROM  Task Order by  
+        CASE WHEN :isAsc = 1 THEN taskTittle END ASC,
+        CASE WHEN :isAsc = 0 THEN taskTittle END DESC  """)
+    fun getTaskListSortByTaskTitle(isAsc: Boolean) : Flow<List<Task>>
+
+
+    @Query(""""SELECT * FROM  Task Order by  
+        CASE WHEN :isAsc = 1 THEN date END ASC,
+        CASE WHEN :isAsc = 0 THEN date END DESC  """)
+    fun getTaskListSortByTaskDate(isAsc: Boolean) : Flow<List<Task>>
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
