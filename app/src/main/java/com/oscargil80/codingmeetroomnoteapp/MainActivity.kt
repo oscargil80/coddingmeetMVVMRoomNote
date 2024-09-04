@@ -7,6 +7,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.ImageView
@@ -14,6 +15,7 @@ import android.widget.Toast
 import androidx.core.view.drawToBitmap
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
@@ -156,8 +158,12 @@ class MainActivity : AppCompatActivity() {
         val taskRVListAdapter = TaskRVListAdapter { type, position, task ->
             if (type == "delete") {
                 taskViewModel
+                        //Deleted task
                     //.deleteTask(task)
                     .deleteTaskUsingId(task.id)
+
+                //Restore deleted task
+                restoreDeletedTask(task)
             } else if (type == "update") {
                 updateETTitle.setText(task.tittle)
                 updateETDesc.setText(task.description)
@@ -198,6 +204,17 @@ class MainActivity : AppCompatActivity() {
         taskViewModel.getTaskList()
         statusCallBack()
         callSearch()
+    }
+
+    private fun restoreDeletedTask( deletedTask: Task){
+        val snarkBar = Snackbar.make(
+            mainBinding.root, "Deleted ${deletedTask.tittle}",
+            Snackbar.LENGTH_INDEFINITE
+        )
+        snarkBar.setAction("Deshacer Eliminado ?"){
+            taskViewModel.insertTask(deletedTask)
+        }
+        snarkBar.show()
     }
 
     private fun callSearch() {
