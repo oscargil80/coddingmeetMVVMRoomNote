@@ -1,6 +1,7 @@
 package com.oscargil80.codingmeetroomnoteapp.repository
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.oscargil80.codingmeetroomnoteapp.dao.TaskDao
@@ -50,7 +51,6 @@ class TaskRepository(application: Application) {
                 } else {
                     taskDao.getTaskListSortByTaskDate(isAsc)
                 }
-
                 _taskStateFlow.emit(Success("loading", result))
             } catch (e: Exception) {
                 _taskStateFlow.emit(Error(e.message.toString()))

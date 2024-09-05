@@ -12,6 +12,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.view.ViewCompat
 import androidx.core.view.drawToBitmap
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
@@ -67,7 +68,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
-
 
         // Add task start
 
@@ -194,16 +194,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
         mainBinding.taskRV.adapter = taskRVListAdapter
+        ViewCompat.setNestedScrollingEnabled(mainBinding.taskRV, false)
+
         taskRVListAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
-                mainBinding.taskRV.smoothScrollToPosition(positionStart)
+                //mainBinding.taskRV.smoothScrollToPosition(positionStart)
+                mainBinding.nestedScrollView.smoothScrollTo(0,positionStart)
             }
 
-            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+            /*override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
                 super.onItemRangeMoved(fromPosition, toPosition, itemCount)
                 mainBinding.taskRV.smoothScrollToPosition(0)
-            }
+            }*/
+
+
         }
         )
         callGetTaskList(taskRVListAdapter)
@@ -248,7 +253,6 @@ class MainActivity : AppCompatActivity() {
             false
         }
         callSortByDialog()
-
     }
 
     private fun callSortByLiveData(){
@@ -321,8 +325,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun callGetTaskList(taskRecyclerViewAdapter: TaskRVListAdapter) {
-
-
         CoroutineScope(Dispatchers.Main).launch {
             taskViewModel.taskStateFlow
                 .collectLatest {
