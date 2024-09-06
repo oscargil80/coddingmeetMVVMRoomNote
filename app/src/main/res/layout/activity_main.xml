@@ -92,7 +92,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/taskRV"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/edSearchL"
                 android:layout_marginTop="8dp"
                 android:layout_marginHorizontal="10dp"
@@ -101,7 +101,6 @@
                 android:orientation="vertical"
                 android:overScrollMode="never"
                 android:paddingBottom="100dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
         </RelativeLayout>
 

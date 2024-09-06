@@ -14,8 +14,11 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.drawToBitmap
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -62,6 +65,10 @@ class MainActivity : AppCompatActivity() {
 
     private val taskViewModel: TaskViewModel by lazy {
         ViewModelProvider(this).get(TaskViewModel::class.java)
+    }
+
+    private val isListMutableLiveData = MutableLiveData<Boolean>().apply {
+        postValue(true)
     }
 
 
@@ -156,10 +163,26 @@ class MainActivity : AppCompatActivity() {
 
         //update task End
 
-        val taskRVListAdapter = TaskRVListAdapter { type, position, task ->
+        isListMutableLiveData.observe(this) {
+            if (it) {
+                mainBinding.taskRV.layoutManager =
+                    LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+                mainBinding.listOrGridImg.setImageResource(R.drawable.ic_view_module)
+            } else {
+                mainBinding.taskRV.layoutManager =
+                    StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL )
+                mainBinding.listOrGridImg.setImageResource(R.drawable.ic_view_list)
+            }
+
+            mainBinding.listOrGridImg.setOnClickListener {
+                isListMutableLiveData.postValue(!isListMutableLiveData.value!!)
+            }
+        }
+
+        val taskRVListAdapter = TaskRVListAdapter(isListMutableLiveData ) { type, position, task ->
             if (type == "delete") {
                 taskViewModel
-                        //Deleted task
+                    //Deleted task
                     //.deleteTask(task)
                     .deleteTaskUsingId(task.id)
 
@@ -200,7 +223,7 @@ class MainActivity : AppCompatActivity() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
                 //mainBinding.taskRV.smoothScrollToPosition(positionStart)
-                mainBinding.nestedScrollView.smoothScrollTo(0,positionStart)
+                mainBinding.nestedScrollView.smoothScrollTo(0, positionStart)
             }
 
             /*override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
@@ -217,12 +240,12 @@ class MainActivity : AppCompatActivity() {
         callSearch()
     }
 
-    private fun restoreDeletedTask( deletedTask: Task){
+    private fun restoreDeletedTask(deletedTask: Task) {
         val snarkBar = Snackbar.make(
             mainBinding.root, "Deleted ${deletedTask.tittle}",
             Snackbar.LENGTH_INDEFINITE
         )
-        snarkBar.setAction("Deshacer Eliminado ?"){
+        snarkBar.setAction("Deshacer Eliminado ?") {
             taskViewModel.insertTask(deletedTask)
         }
         snarkBar.show()
@@ -245,8 +268,8 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
-        mainBinding.edSearch.setOnEditorActionListener{v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH){
+        mainBinding.edSearch.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 hideKeyBoard(v)
                 return@setOnEditorActionListener true
             }
@@ -255,31 +278,32 @@ class MainActivity : AppCompatActivity() {
         callSortByDialog()
     }
 
-    private fun callSortByLiveData(){
-        taskViewModel.sortByLiveData.observe(this){
+    private fun callSortByLiveData() {
+        taskViewModel.sortByLiveData.observe(this) {
             taskViewModel.getTaskList(it.second, it.first)
         }
     }
 
     private fun callSortByDialog() {
         var checkedItem = 0
-        val items = arrayOf("Title Ascending", "Title Descending", "Date Ascending ", "Date Descending")
+        val items =
+            arrayOf("Title Ascending", "Title Descending", "Date Ascending ", "Date Descending")
         mainBinding.sortImg.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Sort By")
                 .setPositiveButton("Ok") { _, _ ->
                     when (checkedItem) {
                         0 -> {
-                            taskViewModel.setSortBy(Pair("title",true))
+                            taskViewModel.setSortBy(Pair("title", true))
                         }
                         1 -> {
-                            taskViewModel.setSortBy(Pair("title",false))
+                            taskViewModel.setSortBy(Pair("title", false))
                         }
                         2 -> {
-                            taskViewModel.setSortBy(Pair("date",true))
+                            taskViewModel.setSortBy(Pair("date", true))
                         }
                         else -> {
-                            taskViewModel.setSortBy(Pair("date",false))
+                            taskViewModel.setSortBy(Pair("date", false))
                         }
                     }
                 }
