@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 
 class TaskRepository(application: Application) {
 
+
     private val taskDao: TaskDao = TaskDatabase.getInstance(application).taskDao
 
     private val _taskStateFlow = MutableStateFlow<Resource<Flow<List<Task>>>>(Loading())
