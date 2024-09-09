@@ -163,6 +163,7 @@ class MainActivity : AppCompatActivity() {
 
         //update task End
 
+
         isListMutableLiveData.observe(this) {
             if (it) {
                 mainBinding.taskRV.layoutManager =
